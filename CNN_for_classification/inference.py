@@ -7,6 +7,15 @@ import os
 from os.path import join, exists, dirname
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 import matplotlib.pyplot as plt
+import pandas
+import sklearn.metrics as metrics
+from keras.models import load_model
+import numpy as np
+from sklearn.metrics import confusion_matrix
+import sklearn.metrics as metrics
+from metrics import *
+from mlxtend.plotting import plot_confusion_matrix
+import numpy as np
 
 def split_test_gen(args):
     datagen = ImageDataGenerator(
@@ -36,17 +45,51 @@ def fit_model(model):
   momentum = 0.9
   opt_Adam = Adam(lr=0.0001) 
 
-  model.compile(loss='binary_crossentropy', optimizer=opt_Adam,metrics=['accuracy'])
+  model.compile(loss='binary_crossentropy', optimizer=opt_Adam,metrics=['accuracy',f1])
   return model
+
+def report_metrics(model,test_generator):
+  y_true = None
+  y_predict_arr = None
+
+  for index in range(test_generator.__len__()):
+    x ,y = test_generator.__getitem__(index)
+    y = np.argmax(y,axis=-1)
+    y_predict = model.predict(x)
+    y_predict = np.argmax(y_predict,axis=-1)
+    if y_true is None :
+        y_true = y
+        y_true_arr = y_predict
+    else:
+        y_true = np.concatenate([y_true,y],axis=0)
+        y_true_arr = np.concatenate([y_true_arr,y_predict],axis=0)
+
+  cm = confusion_matrix(y_true, y_true_arr)      
+  print(cm)
+  report = metrics.classification_report(y_true, y_true_arr,output_dict=True)
+  print(metrics.classification_report(y_true, y_true_arr))
+  if args.save_report is True:
+    path_graph = join(args.path_results,'report_metrics')
+    file_name = join(path_graph,'{}.csv'.format(args.model_dir.split('/')[-1].split('.')[0]))
+    df = pandas.DataFrame(report).transpose()
+    df.to_csv(file_name)
+
+    path_graph = join(args.path_results,'confusion_matrix')
+    file_graph = join(path_graph,'{}.png'.format(args.model_dir.split('/')[-1].split('.')[0]))
+    fig, ax = plot_confusion_matrix(conf_mat=cm,
+                                show_absolute=True,
+                                show_normed=True,
+                                colorbar=True)
+    plt.show()
+    plt.savefig(file_graph)
 
 def main(args):
   create_folders(args)
-  model = load_model(args.model_dir)
+  model = load_model(args.model_dir,compile=False)
+  print('model:',args.model_dir)
   model = fit_model(model=model)
-
-
-
-
+  test_generator = split_test_gen(args)
+  report_metrics(model,test_generator)
 
 
 

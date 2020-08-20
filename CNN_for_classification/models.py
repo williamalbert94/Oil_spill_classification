@@ -1,10 +1,12 @@
-
+import tensorflow as tf
 from keras.applications import vgg16, resnet50, xception , MobileNetV2, InceptionV3
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from keras.layers import Input, Dense, Dropout, Flatten, Activation, merge
 from keras.layers import Conv2D, MaxPooling2D, UpSampling2D, ZeroPadding2D, GlobalAveragePooling2D,GlobalMaxPooling2D
 from keras.models import Sequential, Model
 from keras.optimizers import SGD, Adam
+import keras.backend as K
+from metrics import *
 
 def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
   if args.model=='VGG16':
@@ -29,7 +31,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     opt_SGD = SGD(lr=initial_lr, momentum=momentum, decay=decay_rate, nesterov=False)
     opt_Adam = Adam(lr=initial_lr) 
 
-    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy'])
+    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()
     return model
 
@@ -54,7 +56,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     opt_SGD = SGD(lr=initial_lr, momentum=momentum, decay=decay_rate, nesterov=False)
     opt_Adam = Adam(lr=initial_lr) 
 
-    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy'])
+    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()    
     return model
 
@@ -87,7 +89,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     opt_SGD = SGD(lr=initial_lr, momentum=momentum, decay=decay_rate, nesterov=False)
     opt_Adam = Adam(lr=0.0001) 
 
-    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy'])
+    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()    
     return model
 
@@ -104,7 +106,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     momentum = 0.9
     opt_SGD = SGD(lr=initial_lr, momentum=momentum, decay=decay_rate, nesterov=False)
     opt_Adam = Adam(lr=initial_lr) 
-    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy'])
+    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()
 
 
@@ -137,7 +139,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     momentum = 0.9
     opt_SGD = SGD(lr=initial_lr, momentum=momentum, decay=decay_rate, nesterov=False)
     opt_Adam = Adam(lr=initial_lr) 
-    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy'])
+    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()
 
 
@@ -173,5 +175,5 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     opt_SGD = SGD(lr=initial_lr, momentum=momentum, decay=decay_rate, nesterov=False)
     opt_Adam = Adam(lr=initial_lr) 
 
-    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy'])
+    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()

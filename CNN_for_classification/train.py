@@ -8,15 +8,13 @@ import os
 from os.path import join, exists, dirname
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 import matplotlib.pyplot as plt
+import tensorflow as tf
 
 def split_train_val_generator(args):
     datagen = ImageDataGenerator(
         fill_mode = "nearest",
         rescale=1./255,
-        zoom_range = 0.1,
-        rotation_range=0.1,                    
-        width_shift_range=0.1,               
-        height_shift_range=0.1,              
+        rotation_range=0.1,                                
         horizontal_flip=True,                
         vertical_flip=True,
         validation_split=0.25
@@ -77,14 +75,14 @@ def start_train(args,model,train_generator,validation_generator):
   print('Start the training')
   path_model = join(args.path_results,'models')
   file_name = join(path_model,'{}.model'.format(args.modelname))
-  checkpointer = ModelCheckpoint(file_name, monitor='val_loss',mode='min', save_best_only=False)
+  checkpointer = ModelCheckpoint(file_name, monitor='val_f1',mode='max', save_best_only=False)
   early_stop = EarlyStopping(monitor = 'loss',mode='min', min_delta = 0.001, 
-                             patience = 12) 
+                             patience = 10) 
   history= model.fit_generator(
                  train_generator,
-                 steps_per_epoch = train_generator.samples,
+                 steps_per_epoch = train_generator.samples// args.batch,
                  validation_data = validation_generator, 
-                 validation_steps = validation_generator.samples,
+                 validation_steps = validation_generator.samples// args.batch,
                  epochs = args.epochs,callbacks=[checkpointer,early_stop])
   return history
 
