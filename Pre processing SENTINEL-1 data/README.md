@@ -28,4 +28,4 @@ Dependendo do modelo utilizado no que diz respeito à representação do campo e
 
 O coeficiente de retroespalhamento sem unidade é convertido em dB usando uma transformação logarítmica. Será uma representação virtual em db do retroespalhamento do pulso emitido ao fazer a abertura do radar e interagir com o objeto de interesse.
 
-
+![Results](https://github.com/kurusaki94/Oil_spill_classification/blob/master/Pre%20processing%20SENTINEL-1%20data/graph.png) 
