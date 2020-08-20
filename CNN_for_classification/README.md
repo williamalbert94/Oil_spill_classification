@@ -1,5 +1,5 @@
 # Oil_spill_classification
- Oill spill study codes in gulf of mexico. It contains codes related to CNN architectures, based on classification and semantic segmentation.  Classification: VGG16, ResNet, Inception, Xception, Inception-ResNet. Segmentation: SegNet, Unet, Deeplab v3.
+It contains codes related to CNN architectures, based on classification and semantic segmentation.  Classification: VGG16, ResNet, Inception, Xception, Inception-ResNet. 
  
  # Run training code 
  		python train.py --model_name 'example1' --path_train './train/' --path_results ./results/ --batch 2 --size 256 --classes 2 --epochs 50 --model Xception --no_plot
