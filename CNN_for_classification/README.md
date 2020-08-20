@@ -26,3 +26,7 @@ Parameters:
 * batch : batch size for generator
 * size : size of input of model and out of generator
 * save_report : save cvs to report metrics
+
+# Results
+![alt text][logo]
+[logo]: https://github.com/kurusaki94/Oil_spill_classification/blob/master/CNN_for_classification/confusion_matrix/sea_xception_multiclass.png "Confusion matrix"
