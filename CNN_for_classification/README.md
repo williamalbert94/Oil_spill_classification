@@ -28,4 +28,4 @@ Parameters:
 * save_report : save cvs to report metrics
 
 # Results
-![alt text][logo]: https://github.com/kurusaki94/Oil_spill_classification/blob/master/CNN_for_classification/confusion_matrix/sea_xception_multiclass.png "Confusion matrix"
+![Results](https://github.com/kurusaki94/Oil_spill_classification/blob/master/CNN_for_classification/confusion_matrix/sea_xception_multiclass.png) "Confusion matrix"
