@@ -161,7 +161,20 @@ def get_coordinates(paths,out_size,stride,classes,Mode = 'test',stride_minor_cla
         df_test = pd.DataFrame(list_of_tuples, columns = ['paths', 'coordinates' ,'class'])
         return df_test
 
+def Zoom(img, zoomfactor=0.2):
+    
+    out  = np.zeros_like(img)
+    zoomed = cv2.resize(img, None, fx=zoomfactor, fy=zoomfactor)
+    
+    h, w = img.shape
+    zh, zw = zoomed.shape
+    
+    if zoomfactor<1:  
+        out[(h-zh)/2:-(h-zh)/2, (w-zw)/2:-(w-zw)/2] = zoomed
+    else:              
+        out = zoomed[(zh-h)/2:-(zh-h)/2, (zw-w)/2:-(zw-w)/2]
 
+    return out
 class DataGenerator(Sequence):
     'Generates data for Keras'
     def __init__(self, list_IDs, batch_size=2, dim=(128,128), n_channels=1,
@@ -227,20 +240,6 @@ class DataGenerator(Sequence):
         self.path_image = path_image
         self.images = Image.open(path_image)
 
-    def Zoom(img, zoomfactor=0.8):
-        
-        out  = np.zeros_like(img)
-        zoomed = cv2.resize(img, None, fx=zoomfactor, fy=zoomfactor)
-        
-        h, w = img.shape
-        zh, zw = zoomed.shape
-        
-        if zoomfactor<1:  
-            out[(h-zh)/2:-(h-zh)/2, (w-zw)/2:-(w-zw)/2] = zoomed
-        else:              
-            out = zoomed[(zh-h)/2:-(zh-h)/2, (zw-w)/2:-(zw-w)/2]
-
-        return out
 
     def __data_generation(self, list_IDs_temp):
         'Generates data containing batch_size samples'

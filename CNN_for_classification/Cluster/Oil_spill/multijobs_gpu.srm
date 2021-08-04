@@ -17,7 +17,7 @@ JOBNAME=$SLURM_JOB_NAME            # re-use the job-name specified above
 N_JOB=$SLURM_NTASKS                # create as many jobs as tasks
 
 dir_python='/radar_temp/env_tf113/bin/'
-dir_scripts='/Modelos_clasificacion/tf_1.13/'
+dir_scripts='/Models/tf_1.13/'
 Name_base_model='oil_radar_'
 save_path='/Path/Results'
 dataset='/Data/Oil_segmentation'
