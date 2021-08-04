@@ -1,0 +1,61 @@
+#!/bin/bash
+#SBATCH --nodes=1           #Numero de Nós
+#SBATCH --ntasks-per-node=4 #Numero de tarefas por Nó
+#SBATCH --ntasks=4          #Numero de tarefas
+#SBATCH -p ict_gpu          #Fila (partition) a ser utilizada
+#SBATCH -J Radar_train        #Nome job
+#SBATCH --account=default
+
+# Show nodes
+echo $SLURM_JOB_NODELIST
+nodeset -e $SLURM_JOB_NODELIST
+echo "SLURM_JOBID: " $SLURM_JOBID
+
+JOBNAME=$SLURM_JOB_NAME            # re-use the job-name specified above
+
+# Run 1 job per task
+N_JOB=$SLURM_NTASKS                # create as many jobs as tasks
+
+dir_python='/radar_temp/env_tf113/bin/'
+dir_scripts='/Models/tf_1.13/'
+Name_base_model='oil_radar_'
+save_path='/Path/Results'
+dataset='/Data/Oil_segmentation'
+N_exp=40
+
+for((j=0; j<$N_exp; j++))
+	for((i=0; i<$N_JOB; i++))
+		do
+		  mkdir $JOBNAME.run$i             # Make subdirectories for each job
+		  cd $JOBNAME.run$i               # Go to job directory
+
+			if [ $i -eq 0 ] ; then
+			  # Run your executable, note the "&"
+			  time $dir_python'python' $dir_scripts'train_classification.py' --model_name 'min_max_mobilenet_'$j --path_train $dataset --path_results $save_path --optm "Adam" --norm "min_max" --batch 16 --size 256 --classes 2 --stride 40  --epochs 100 --model "MobileNetV2" --no_plot --gpu_id ${i} &
+			  
+			elif [ $i -eq 1 ]; then
+			  # Run your executable, note the "&"
+			  time $dir_python'python' $dir_scripts'train_classification.py' --model_name 'standar_mobilenet_'$j --path_train $dataset --path_results $save_path --optm "Adam" --norm "standar" --batch 16 --size 256 --classes 2 --stride 40  --epochs 100 --model "MobileNetV2" --no_plot --gpu_id ${i} &
+			
+			elif [ $i -eq 2 ]; then
+			  # Run your executable, note the "&"
+			  time $dir_python'python' $dir_scripts'train_classification.py' --model_name 'min_max_xception_'$j --path_train $dataset --path_results $save_path --optm "Adam" --norm "min_max" --batch 16 --size 256 --classes 2 --stride 40  --epochs 100 --model "Xception" --no_plot --gpu_id ${i} &
+			
+			elif [ $i -eq 3 ]; then
+			  # Run your executable, note the "&"
+			  time $dir_python'python' $dir_scripts'train_classification.py' --model_name 'standar_xception_'$j --path_train $dataset --path_results $save_path --optm "Adam" --norm "standar" --batch 16 --size 256 --classes 2 --stride 40  --epochs 100 --model "Xception" --no_plot --gpu_id ${i} &
+			else
+			  echo "Too many jobs"
+			fi
+			cd ..
+		done
+		wait
+
+
+
+
+
+
+
+
+
