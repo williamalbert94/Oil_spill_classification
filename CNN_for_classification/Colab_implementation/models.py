@@ -7,6 +7,8 @@ from keras.models import Sequential, Model
 from keras.optimizers import SGD, Adam
 import keras.backend as K
 from metrics import *
+from keras.layers import BatchNormalization
+
 
 def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
   if args.model=='VGG16':
@@ -64,6 +66,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     pre_trained_model = xception.Xception(weights="imagenet",include_top=False, input_shape=(args.size, args.size, 3))
     x=pre_trained_model.output
     x=GlobalAveragePooling2D()(x)
+    x=Dense(1024, activation='relu')(x)
     x=Dropout(rate=0.5)(x)
     x=Dense(1024, activation='relu')(x)
     x=Dropout(rate=0.5)(x)
@@ -71,7 +74,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     preds=Dense(args.classes,activation='softmax')(x) 
     model=Model(inputs=pre_trained_model.input, outputs=preds)
     for layer in pre_trained_model.layers:
-        layer.trainable=False
+        layer.trainable=True
     for layer in model.layers:
         if hasattr(layer, 'moving_mean') and hasattr(layer, 'moving_variance'):
             layer.trainable = True
@@ -108,7 +111,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     opt_Adam = Adam(lr=initial_lr) 
     model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()
-
+    return model
 
   if args.model=='Inception':
 
@@ -141,7 +144,7 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     opt_Adam = Adam(lr=initial_lr) 
     model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()
-
+    return model
 
 
   if args.model=='InceptionResNet':
@@ -160,6 +163,8 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
     last_output = last_layer.output
     x = GlobalMaxPooling2D()(last_output)
     # Add a fully connected layer with 512 hidden units and ReLU activation
+    x=Dense(1024, activation='relu')(x)
+    x=Dropout(rate=0.5)(x)
     x = Dense(1024, activation='relu')(x)
     x=Dropout(rate=0.5)(x)
     x = Dense(512, activation='relu')(x)
@@ -177,3 +182,48 @@ def get_model(args,loss_function='binary_crossentropy',initial_lr=0.0001):
 
     model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
     model.summary()
+    return model
+
+  if args.model=='Custom':
+
+    inputShape= (args.size, args.size,3)
+    model=Sequential()
+
+    model.add(Conv2D(64, (3,3), activation = 'relu', input_shape = inputShape))
+    model.add(MaxPooling2D(2,2))
+    model.add(BatchNormalization(axis =-1))
+    model.add(Dropout(0.5))
+
+    model.add(Conv2D(64, (3,3), activation = 'relu', input_shape = inputShape))
+    model.add(MaxPooling2D(2,2))
+    model.add(BatchNormalization(axis =-1))
+    model.add(Dropout(0.5))
+
+    model.add(Conv2D(32, (3,3), activation = 'relu'))
+    model.add(MaxPooling2D(2,2))
+    model.add(BatchNormalization(axis = -1))
+    model.add(Dropout(0.5))
+
+    model.add(Conv2D(32, (3,3), activation = 'relu'))
+    model.add(MaxPooling2D(2,2))
+    model.add(BatchNormalization(axis = -1))
+    model.add(Dropout(0.5))
+
+    model.add(Flatten())
+    model.add(Dense(2048, activation = 'relu'))
+    model.add(Dropout(0.5))   
+    model.add(Dense(1024, activation = 'relu'))
+    model.add(Dropout(0.5))     
+    model.add(Dense(512, activation = 'relu'))
+    model.add(BatchNormalization(axis = -1))
+    model.add(Dropout(0.5))
+    model.add(Dense(args.classes, activation = 'softmax'))
+    decay_rate = 0
+    momentum = 0.9
+    opt_SGD = SGD(lr=initial_lr, momentum=momentum, decay=decay_rate, nesterov=False)
+    opt_Adam = Adam(lr=initial_lr) 
+
+    model.compile(loss=loss_function, optimizer=opt_Adam,metrics=['accuracy',f1])
+    model.summary()
+
+    return model

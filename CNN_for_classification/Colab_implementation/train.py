@@ -76,7 +76,7 @@ def start_train(args,model,train_generator,validation_generator):
   path_model = join(args.path_results,'models')
   file_name = join(path_model,'{}.model'.format(args.modelname))
   checkpointer = ModelCheckpoint(file_name, monitor='val_f1',mode='max', save_best_only=False)
-  early_stop = EarlyStopping(monitor = 'loss',mode='min', min_delta = 0.001, 
+  early_stop = EarlyStopping(monitor = 'val_acc',mode='max', min_delta = 0.001, 
                              patience = 10) 
   history= model.fit_generator(
                  train_generator,
